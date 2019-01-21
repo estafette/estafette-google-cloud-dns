@@ -1,0 +1,73 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: estafette
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: estafette-google-cloud-dns
+  namespace: estafette
+  labels:
+    app: estafette-google-cloud-dns
+    team: ${TEAM_NAME}
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: estafette-google-cloud-dns
+  namespace: estafette
+  labels:
+    app: estafette-google-cloud-dns
+    team: ${TEAM_NAME}
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: estafette-google-cloud-dns
+  template:
+    metadata:
+      labels:
+        app: estafette-google-cloud-dns
+        team: ${TEAM_NAME}
+        version: ${VERSION}
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9101"
+    spec:
+      serviceAccount: ${APP_NAME}
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 10
+            preference:
+              matchExpressions:
+              - key: cloud.google.com/gke-preemptible
+                operator: In
+                values:
+                - "true"
+      containers:
+      - name: estafette-google-cloud-dns
+        image: estafette/estafette-google-cloud-dns:${GO_PIPELINE_LABEL}
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: "GOOGLE_CLOUD_DNS_PROJECT"
+          value: "${GOOGLE_CLOUD_DNS_PROJECT}"
+        - name: "GOOGLE_CLOUD_DNS_ZONE"
+          value: "${GOOGLE_CLOUD_DNS_ZONE}"
+        resources:
+          requests:
+            cpu: 50m
+            memory: 50Mi
+          limits:
+            cpu: 50m
+            memory: 50Mi
+        livenessProbe:
+          httpGet:
+            path: /metrics
+            port: 9101
+          initialDelaySeconds: 30
+          timeoutSeconds: 1

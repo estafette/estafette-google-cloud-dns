@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: estafette
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRole
+metadata:
+  name: estafette-google-cloud-dns
+  labels:
+    app: estafette-google-cloud-dns
+rules:
+- apiGroups: [""] # "" indicates the core API group
+  resources:
+  - services
+  verbs:
+  - list
+  - watch
+  - update
+- apiGroups: ["extensions"]
+  resources:
+  - ingresses
+  verbs:
+  - list
+  - watch
+  - update
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: estafette-google-cloud-dns
+  labels:
+    app: estafette-google-cloud-dns
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: estafette-google-cloud-dns
+subjects:
+- kind: ServiceAccount
+  name: estafette-google-cloud-dns
+  namespace: estafette
