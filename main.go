@@ -76,6 +76,7 @@ func main() {
 
 	// parse command line parameters
 	flag.Parse()
+	kingpin.Parse()
 
 	// log as severity for stackdriver logging to recognize the level
 	zerolog.LevelFieldName = "severity"
