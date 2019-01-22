@@ -40,24 +40,28 @@ func NewGoogleCloudDNSService(project, zone string) *GoogleCloudDNSService {
 // UpsertDNSRecord either updates or creates a dns record.
 func (dnsService *GoogleCloudDNSService) UpsertDNSRecord(dnsRecordType, dnsRecordName, dnsRecordContent string) (err error) {
 
+	record := dns.ResourceRecordSet{
+		Name: fmt.Sprintf("%v.", dnsRecordName),
+		Rrdatas: []string{
+			dnsRecordContent,
+		},
+		Type: dnsRecordType,
+		Ttl:  300,
+	}
+
+	log.Debug().Interface("record", record).Msgf("Record sent to google cloud dns api")
+
 	resp, err := dnsService.service.Changes.Create(dnsService.project, dnsService.zone, &dns.Change{
 		Additions: []*dns.ResourceRecordSet{
-			&dns.ResourceRecordSet{
-				Name: fmt.Sprintf("%v.", dnsRecordName),
-				Rrdatas: []string{
-					dnsRecordContent,
-				},
-				Type: "A",
-				Ttl:  300,
-			},
+			&record,
 		},
 	}).Context(context.Background()).Do()
+
+	log.Debug().Interface("response", resp).Msgf("Response from google cloud dns api")
 
 	if err != nil {
 		return err
 	}
-
-	log.Debug().Interface("response", resp).Msgf("Response from google cloud dns api")
 
 	return
 }
