@@ -19,8 +19,10 @@ type GoogleCloudDNSService struct {
 // NewGoogleCloudDNSService returns an initialized APIClient
 func NewGoogleCloudDNSService(project, zone string) *GoogleCloudDNSService {
 
+	log.Debug().Msgf("Creating new GoogleCloudDNSService for project %v and zone %v", project, zone)
+
 	ctx := context.Background()
-	googleClient, err := google.DefaultClient(ctx, dns.CloudPlatformScope, dns.NdevClouddnsReadwriteScope)
+	googleClient, err := google.DefaultClient(ctx, dns.NdevClouddnsReadwriteScope)
 	if err != nil {
 		log.Fatal().Err(err).Msg("Creating google cloud client failed")
 	}
@@ -42,11 +44,13 @@ func (dnsService *GoogleCloudDNSService) UpsertDNSRecord(dnsRecordType, dnsRecor
 
 	record := dns.ResourceRecordSet{
 		Name: fmt.Sprintf("%v.", dnsRecordName),
+		Type: dnsRecordType,
+		Ttl:  300,
 		Rrdatas: []string{
 			dnsRecordContent,
 		},
-		Type: dnsRecordType,
-		Ttl:  300,
+		SignatureRrdatas: []string{},
+		Kind:             "dns#resourceRecordSet",
 	}
 
 	log.Debug().Interface("record", record).Msgf("Record sent to google cloud dns api")
