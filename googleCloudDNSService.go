@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/rs/zerolog/log"
 	"golang.org/x/oauth2/google"
@@ -42,8 +43,7 @@ func (dnsService *GoogleCloudDNSService) UpsertDNSRecord(dnsRecordType, dnsRecor
 	resp, err := dnsService.service.Changes.Create(dnsService.project, dnsService.zone, &dns.Change{
 		Additions: []*dns.ResourceRecordSet{
 			&dns.ResourceRecordSet{
-				Kind: "dns#resourceRecordSet",
-				Name: dnsRecordName,
+				Name: fmt.Sprintf("%v.", dnsRecordName),
 				Rrdatas: []string{
 					dnsRecordContent,
 				},
