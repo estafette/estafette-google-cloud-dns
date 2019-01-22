@@ -19,7 +19,7 @@ type GoogleCloudDNSService struct {
 func NewGoogleCloudDNSService(project, zone string) *GoogleCloudDNSService {
 
 	ctx := context.Background()
-	googleClient, err := google.DefaultClient(ctx)
+	googleClient, err := google.DefaultClient(ctx, dns.NdevClouddnsReadwriteScope)
 	if err != nil {
 		log.Fatal().Err(err).Msg("Creating google cloud client failed")
 	}
