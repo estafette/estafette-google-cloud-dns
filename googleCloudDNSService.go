@@ -41,7 +41,15 @@ func (dnsService *GoogleCloudDNSService) UpsertDNSRecord(dnsRecordType, dnsRecor
 
 	resp, err := dnsService.service.Changes.Create(dnsService.project, dnsService.zone, &dns.Change{
 		Additions: []*dns.ResourceRecordSet{
-			&dns.ResourceRecordSet{},
+			&dns.ResourceRecordSet{
+				Kind: "dns#resourceRecordSet",
+				Name: dnsRecordName,
+				Rrdatas: []string{
+					dnsRecordContent,
+				},
+				Type: "A",
+				Ttl:  300,
+			},
 		},
 	}).Context(context.Background()).Do()
 
