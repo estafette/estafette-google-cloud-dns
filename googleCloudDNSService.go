@@ -39,33 +39,58 @@ func NewGoogleCloudDNSService(project, zone string) *GoogleCloudDNSService {
 	}
 }
 
+// GetDNSRecordByName returns the record sets matching name and type
+func (dnsService *GoogleCloudDNSService) GetDNSRecordByName(dnsRecordType, dnsRecordName string) (records []*dns.ResourceRecordSet) {
+
+	records = make([]*dns.ResourceRecordSet, 0)
+
+	req := dnsService.service.ResourceRecordSets.List(dnsService.project, dnsService.zone).Name(dnsRecordName).Type(dnsRecordType)
+
+	err := req.Pages(context.Background(), func(page *dns.ResourceRecordSetsListResponse) error {
+		records = page.Rrsets
+		return nil
+	})
+
+	if err != nil {
+		log.Error().Err(err).Msgf("Failed retrieving records")
+	}
+
+	return
+}
+
 // UpsertDNSRecord either updates or creates a dns record.
 func (dnsService *GoogleCloudDNSService) UpsertDNSRecord(dnsRecordType, dnsRecordName, dnsRecordContent string) (err error) {
 
-	record := dns.ResourceRecordSet{
-		Name: fmt.Sprintf("%v.", dnsRecordName),
-		Type: dnsRecordType,
-		Ttl:  300,
-		Rrdatas: []string{
-			dnsRecordContent,
+	// retrieve records in case they exist
+	records := dnsService.GetDNSRecordByName(dnsRecordType, dnsRecordName)
+
+	change := dns.Change{
+		Additions: []*dns.ResourceRecordSet{
+			&dns.ResourceRecordSet{
+				Name: fmt.Sprintf("%v.", dnsRecordName),
+				Type: dnsRecordType,
+				Ttl:  300,
+				Rrdatas: []string{
+					dnsRecordContent,
+				},
+				SignatureRrdatas: []string{},
+				Kind:             "dns#resourceRecordSet",
+			},
 		},
-		SignatureRrdatas: []string{},
-		Kind:             "dns#resourceRecordSet",
 	}
 
-	log.Debug().Interface("record", record).Msgf("Record sent to google cloud dns api")
+	if len(records) > 0 {
+		// updating a record is done by deleting the current ones and adding the new one
+		change.Deletions = records
+	}
 
-	resp, err := dnsService.service.Changes.Create(dnsService.project, dnsService.zone, &dns.Change{
-		Additions: []*dns.ResourceRecordSet{
-			&record,
-		},
-	}).Context(context.Background()).Do()
-
-	log.Debug().Interface("response", resp).Msgf("Response from google cloud dns api")
+	resp, err := dnsService.service.Changes.Create(dnsService.project, dnsService.zone, &change).Context(context.Background()).Do()
 
 	if err != nil {
 		return err
 	}
+
+	log.Debug().Interface("response", resp).Msgf("Response from google cloud dns api")
 
 	return
 }
