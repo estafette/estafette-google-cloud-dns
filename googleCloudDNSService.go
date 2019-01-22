@@ -44,7 +44,7 @@ func (dnsService *GoogleCloudDNSService) GetDNSRecordByName(dnsRecordType, dnsRe
 
 	records = make([]*dns.ResourceRecordSet, 0)
 
-	req := dnsService.service.ResourceRecordSets.List(dnsService.project, dnsService.zone).Name(dnsRecordName).Type(dnsRecordType)
+	req := dnsService.service.ResourceRecordSets.List(dnsService.project, dnsService.zone).Name(fmt.Sprintf("%v.", dnsRecordName)).Type(dnsRecordType)
 
 	err := req.Pages(context.Background(), func(page *dns.ResourceRecordSetsListResponse) error {
 		records = page.Rrsets
