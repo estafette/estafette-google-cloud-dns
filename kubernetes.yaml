@@ -59,7 +59,7 @@ spec:
         - name: "GOOGLE_CLOUD_DNS_ZONE"
           value: "${GOOGLE_CLOUD_DNS_ZONE}"
         - name: GOOGLE_APPLICATION_CREDENTIALS
-          value: /secrets/google-service-account.json
+          value: /secrets/service-account-key.json
         resources:
           requests:
             cpu: 50m
