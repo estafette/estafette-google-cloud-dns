@@ -89,6 +89,7 @@ metadata:
   labels:
     app: estafette-google-cloud-dns
     team: ${TEAM_NAME}
+  annotations:
+    estafette.io/gcp-service-account: 'true'
+    estafette.io/gcp-service-account-name: 'estafette-google-cloud-dns'
 type: Opaque
-data:
-  google-service-account.json: ${GOOGLE_SERVICE_ACCOUNT}

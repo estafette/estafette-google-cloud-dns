@@ -26,6 +26,10 @@ curl https://raw.githubusercontent.com/estafette/estafette-google-cloud-dns/mast
 curl https://raw.githubusercontent.com/estafette/estafette-google-cloud-dns/master/kubernetes.yaml | envsubst | kubectl apply -f -
 ```
 
+Award the following role to the automatically generated service account in the project specified by GOOGLE_CLOUD_DNS_PROJECT:
+
+* DNS Administrator
+
 Once it's running put the following annotations on a service of type LoadBalancer and deploy. The estafette-goole-cloud-dns application will watch changes to services and process those. Once approximately every 300 seconds it also scans all services as a safety net.
 
 ```yaml
