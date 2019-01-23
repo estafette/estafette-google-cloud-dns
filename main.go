@@ -380,7 +380,6 @@ func makeServiceChanges(dnsService *GoogleCloudDNSService, client *k8s.Client, s
 		service.Metadata.Annotations[annotationGoogleCloudDNSState] = string(googleCloudDNSStateByteArray)
 
 		// update service, because the state annotations have changed
-		client.Update(context.Background(), service)
 		err = client.Update(context.Background(), service)
 		if err != nil {
 			log.Error().Err(err).Msgf("[%v] Service %v.%v - Updating service state has failed", initiator, *service.Metadata.Name, *service.Metadata.Namespace)
