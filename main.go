@@ -410,6 +410,8 @@ func makeIngressChanges(dnsService *GoogleCloudDNSService, client *k8s.Client, i
 	// check if LoadBalancer has an ip address
 	if desiredState.Enabled == "true" && len(desiredState.Hostnames) > 0 && desiredState.IPAddress != "" {
 
+		log.Debug().Interface("desiredState", desiredState).Interface("currentState", currentState).Msgf("[%v] Service %v.%v - Comparing current and desired state", initiator, *ingress.Metadata.Name, *ingress.Metadata.Namespace)
+
 		// update dns record if anything has changed compared to the stored state
 		if desiredState.IPAddress != currentState.IPAddress ||
 			desiredState.Hostnames != currentState.Hostnames {
