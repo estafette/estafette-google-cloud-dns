@@ -383,7 +383,7 @@ func getDesiredIngressState(ingress *v1beta1.Ingress) (state GoogleCloudDNSState
 func getCurrentIngressState(ingress *v1beta1.Ingress) (state GoogleCloudDNSState) {
 
 	// get state stored in annotations if present or set to empty struct
-	googleCloudDNSStateString, ok := ingress.Metadata.Annotations[annotationGoogleCloudDNS]
+	googleCloudDNSStateString, ok := ingress.Metadata.Annotations[annotationGoogleCloudDNSState]
 	if !ok {
 		// couldn't find saved state, setting to default struct
 		state = GoogleCloudDNSState{}
