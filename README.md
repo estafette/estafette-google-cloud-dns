@@ -8,23 +8,25 @@ This small Kubernetes application configures dns in Google Cloud DNS for any ser
 
 In order not to have to set dns records manually or from deployment scripts this application decouples that responsibility and moves it into the Kubernetes cluster itself.
 
-## Usage
+## Installation
 
-Deploy:
+Prepare using Helm:
 
 ```
-export TEAM_NAME=tooling
-export VERSION=0.0.1
-export GO_PIPELINE_LABEL=0.0.1
-export GOOGLE_CLOUD_DNS_PROJECT="my-gcp-project-name"
-export GOOGLE_CLOUD_DNS_ZONE="my-cloud-dns-zone-name
-
-# Setup RBAC
-curl https://raw.githubusercontent.com/estafette/estafette-google-cloud-dns/master/rbac.yaml | kubectl apply -f -
-
-# Install application
-curl https://raw.githubusercontent.com/estafette/estafette-google-cloud-dns/master/kubernetes.yaml | envsubst | kubectl apply -f -
+brew install kubernetes-helm
+kubectl -n kube-system create serviceaccount tiller
+kubectl create clusterrolebinding tiller --clusterrole=cluster-admin --serviceaccount=kube-system:tiller
+helm init --service-account tiller --wait
 ```
+
+Then install or upgrade with Helm:
+
+```
+helm repo add estafette https://helm.estafette.io
+helm upgrade --install estafette-google-cloud-dns --namespace estafette estafette/estafette-google-cloud-dns
+```
+
+## IAM
 
 Award the following role to the automatically generated service account in the project specified by GOOGLE_CLOUD_DNS_PROJECT:
 
