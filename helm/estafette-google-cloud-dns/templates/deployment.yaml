@@ -45,6 +45,8 @@ spec:
             {{- toYaml . | nindent 12 }}
           {{- end }}
           env:
+            - name: "ESTAFETTE_LOG_FORMAT"
+              value: "{{ .Values.logFormat }}"
             - name: GOOGLE_CLOUD_DNS_PROJECT
               value: {{ .Values.gcpDnsProject | quote }}
             - name: GOOGLE_CLOUD_DNS_ZONE

@@ -37,6 +37,7 @@ var (
 	googleCloudDNSProject = kingpin.Flag("project", "The Google Cloud project id the Cloud DNS zone is configured in.").Envar("GOOGLE_CLOUD_DNS_PROJECT").Required().String()
 	googleCloudDNSZone    = kingpin.Flag("zone", "The Google Cloud zone name to use Cloud DNS for.").Envar("GOOGLE_CLOUD_DNS_ZONE").Required().String()
 
+	appgroup  string
 	app       string
 	version   string
 	branch    string
@@ -63,7 +64,8 @@ func main() {
 	// parse command line parameters
 	kingpin.Parse()
 
-	foundation.InitLogging(app, version, branch, revision, buildDate)
+	// init log format from envvar ESTAFETTE_LOG_FORMAT
+	foundation.InitLoggingFromEnv(appgroup, app, version, branch, revision, buildDate)
 
 	// create kubernetes api client
 	kubeClient, err := k8s.NewInClusterClient()
