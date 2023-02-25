@@ -15,6 +15,6 @@ require (
 	github.com/rs/zerolog v1.17.2
 	github.com/sergi/go-diff v1.0.0 // indirect
 	golang.org/x/oauth2 v0.0.0-20190115181402-5dab4167f31c
-	golang.org/x/text v0.3.1-0.20180807135948-17ff2d5776d2 // indirect
+	golang.org/x/text v0.3.8 // indirect
 	google.golang.org/api v0.1.0
 )
